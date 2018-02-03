@@ -3,6 +3,7 @@ const fs      = require('fs');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const app     = express();
+const conflateHeadlines = require('./conflate-headlines');
 
 // To write to the system we will use the built in 'fs' library.
 // In this example we will pass 3 parameters to the writeFile function
@@ -21,7 +22,7 @@ function writeFile(res, data) {
 
 app.get('/scrape', (req, res) => {
 
-    let json = { sunHeadline : '', starHeadline : ''};
+    let json = { sunHeadline : '', starHeadline : '', conflation: ''};
     let sunHeadline;
     let starHeadline;
     let sunHeadlineText;
@@ -46,26 +47,19 @@ app.get('/scrape', (req, res) => {
         headline = $('.teaser__headline').first();
         headlineText = headline.text();
         json.sunHeadline = headlineText;
-
+        // Star request
+        return rp(starOptions);
+    }).then(($) => {
+        headline = $('.story .caption').first();
+        headlineText = headline.text();
+        json.starHeadline = headlineText;
+        json.conflation = conflateHeadlines(json.sunHeadline, json.starHeadline);
         const pjson = JSON.stringify(json, null, 4);
         console.log('pjson', pjson);
         writeFile(res, pjson);
     }).catch((err) => {
         console.log('there was a request error: ', err);
     });
-
-    // Star request
-    rp(starOptions).then(($) => {
-        headline = $('.story .caption').first();
-        headlineText = headline.text();
-        json.starHeadline = headlineText;
-        const pjson = JSON.stringify(json, null, 4);
-        console.log('pjson', pjson);
-        //writeFile(res, pjson);
-    }).catch((err) => {
-        console.log('there was a request error: ', err);
-    });
-
 });
 
 app.listen('8081');
