@@ -46,3 +46,4 @@ Desktop.ini
 
 # Project
 # add project specific ignores here
+/dist
