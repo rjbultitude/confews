@@ -1,6 +1,6 @@
 const express = require('express');
 const fs      = require('fs');
-const request = require('request');
+const rp = require('request-promise');
 const cheerio = require('cheerio');
 const app     = express();
 
@@ -21,50 +21,51 @@ function writeFile(res, data) {
 
 app.get('/scrape', (req, res) => {
 
-    const sunUrl = 'https://www.thesun.co.uk/news/';
-    const starUrl = 'https://www.dailystar.co.uk/news';
     let json = { sunHeadline : '', starHeadline : ''};
     let sunHeadline;
     let starHeadline;
     let sunHeadlineText;
     let starHeadlineText;
 
-    // Sun request
-    request(sunUrl, (error, response, html) => {
-        
-        // First we'll check to make sure no errors occurred when making the request
-
-        if(!error) {
-            // Next, we'll utilize the cheerio library on the returned html which will essentially give us jQuery functionality
-            var $ = cheerio.load(html);
-            headline = $('.teaser__headline').first();
-            headlineText = headline.text();
-            json.sunHeadline = headlineText;
-        } else {
-            console.log('there was an error with the request');
+    const sunOptions = {
+        uri: 'https://www.thesun.co.uk/news/',
+        transform: function (body) {
+            return cheerio.load(body);
         }
+    };
+
+    const starOptions = {
+        uri: 'https://www.dailystar.co.uk/news',
+        transform: function (body) {
+            return cheerio.load(body);
+        }
+    };
+
+    // Sun request
+    rp(sunOptions).then(($) => {
+        headline = $('.teaser__headline').first();
+        headlineText = headline.text();
+        json.sunHeadline = headlineText;
 
         const pjson = JSON.stringify(json, null, 4);
         console.log('pjson', pjson);
         writeFile(res, pjson);
+    }).catch((err) => {
+        console.log('there was a request error: ', err);
     });
 
     // Star request
-    request(starUrl, (error, response, html) => {
-        if(!error) {
-            var $ = cheerio.load(html);
-            headline = $('.story .caption').first();
-            headlineText = headline.text();
-            json.starHeadline = headlineText;
-        } else {
-            console.log('there was an error with the request');
-        }
-
+    rp(starOptions).then(($) => {
+        headline = $('.story .caption').first();
+        headlineText = headline.text();
+        json.starHeadline = headlineText;
         const pjson = JSON.stringify(json, null, 4);
         console.log('pjson', pjson);
         //writeFile(res, pjson);
+    }).catch((err) => {
+        console.log('there was a request error: ', err);
     });
-    
+
 });
 
 app.listen('8081');
