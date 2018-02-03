@@ -22,11 +22,7 @@ function writeFile(res, data) {
 
 app.get('/scrape', (req, res) => {
 
-    let json = { sunHeadline : '', starHeadline : '', conflation: ''};
-    let sunHeadline;
-    let starHeadline;
-    let sunHeadlineText;
-    let starHeadlineText;
+    let json = { sunHeadline : '', starHeadline : '', guardianHeadline : '', conflation: ''};
 
     const sunOptions = {
         uri: 'https://www.thesun.co.uk/news/',
@@ -42,18 +38,30 @@ app.get('/scrape', (req, res) => {
         }
     };
 
+    const guardianOptions = {
+        uri: 'https://www.theguardian.com/uk',
+        transform: function (body) {
+            return cheerio.load(body);
+        }
+    };
+
     // Sun request
     rp(sunOptions).then(($) => {
-        headline = $('.teaser__headline').first();
-        headlineText = headline.text();
+        let headline = $('.teaser__headline').first();
+        let headlineText = headline.text();
         json.sunHeadline = headlineText;
         // Star request
         return rp(starOptions);
     }).then(($) => {
-        headline = $('.story .caption').first();
-        headlineText = headline.text();
+        let headline = $('.story .caption').first();
+        let headlineText = headline.text();
         json.starHeadline = headlineText;
-        json.conflation = conflateHeadlines(json.sunHeadline, json.starHeadline);
+        return rp(guardianOptions);
+    }).then(($) => {
+        let headline = $('h1 .js-headline-text').first();
+        let headlineText = headline.text();
+        json.guardianHeadline = headlineText;
+        json.conflation = conflateHeadlines(json.sunHeadline, json.starHeadline, json.guardianHeadline);
         const pjson = JSON.stringify(json, null, 4);
         console.log('pjson', pjson);
         writeFile(res, pjson);
