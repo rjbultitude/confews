@@ -1,7 +1,7 @@
 # Confews
 
 ## Project Introduction
-Confews is a Twitter bot that scapes and then conflates daily news headlines for amusement. 
+Confews is a Twitter bot that scrapes and then conflates daily news headlines for amusement. 
 
 ## Installation
 

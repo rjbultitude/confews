@@ -48,3 +48,4 @@ Desktop.ini
 # add project specific ignores here
 /dist
 /output.json
+/config.js

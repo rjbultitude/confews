@@ -2,8 +2,10 @@ const express = require('express');
 const fs      = require('fs');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
-const app     = express();
+const Twit = require('twit');
 const conflateHeadlines = require('./conflate-headlines');
+const config = require('./config');
+const app     = express();
 
 // To write to the system we will use the built in 'fs' library.
 // In this example we will pass 3 parameters to the writeFile function
@@ -63,7 +65,14 @@ app.get('/scrape', (req, res) => {
         json.guardianHeadline = headlineText;
         json.conflation = conflateHeadlines(json.sunHeadline, json.starHeadline, json.guardianHeadline);
         const pjson = JSON.stringify(json, null, 4);
-        console.log('pjson', pjson);
+        //console.log('pjson', pjson);
+        const T = new Twit(config);
+        T.post('statuses/update', { status: json.conflation }, (err, data, response) => {
+            if (!err) {
+                console.log(data);
+                console.log(response);
+            }
+        });
         writeFile(res, pjson);
     }).catch((err) => {
         console.log('there was a request error: ', err);
