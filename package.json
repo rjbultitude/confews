@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "test",
-    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./package-lock.json,./npm-debug.log,./README.md --copy-files",
-    "start": "npm run build && node dist/server.js"
+    "start": "node server.js",
+    "stop": "node server.js"
   },
   "author": "richard bultitude",
   "license": "ISC",

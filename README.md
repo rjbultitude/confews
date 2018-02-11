@@ -23,3 +23,15 @@ TBC
 
 [cheerio](https://cheerio.js.org/)
 
+### Design
+
+1. Scrape three headlines
+2. Perform any source specific sanitisation
+3. Add all headlines to an array
+4. Perform any general sanitisation
+5. Truncate at comma or full stop if available
+6. Truncate at three words as alternative to step 5
+7. Determine which headlines end with a conjunction and move them to start of array
+8. Determine which headlines end with a handle verb and move them to start of array
+9. Ensure last headline in array doesn't end with a conjuntion or handle verb
+

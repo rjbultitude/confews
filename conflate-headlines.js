@@ -1,10 +1,9 @@
-function firstThree(str) {
-    return str.split(' ').slice(0, 3).join(' ');
-}
+const wordHelpers = require('./word-helpers');
 
-module.exports = function conflateHeadlines(str1, str2, str3) {
-    const conflated = `${firstThree(str1)} ${firstThree(str2)} ${firstThree(str3)}`.toLowerCase();
-    const noPunctuation = conflated.replace(/\'|\"|\(|\)|\‘/g, '');
-    const noBreaking = noPunctuation.replace(/breaking/g, '');
-    return noBreaking;
+module.exports = function conflateHeadlines(headlines) {
+    const sunSanit = wordHelpers.sanitiseSun(headlines.sunHeadline);
+    const allSanit = wordHelpers.sanitiseHeadlines([sunSanit, headlines.starHeadline, headlines.guardianHeadline]);
+    const allTrunc = wordHelpers.truncateStrings(allSanit);
+    const conflated = `${allTrunc[0]} ${allTrunc[1]} ${allTrunc[2]}`;
+    return conflated;
 }

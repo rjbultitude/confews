@@ -14,12 +14,9 @@ const app     = express();
 // Parameter 3 :  callback function - a callback function to let us know the status of our function
 
 function writeFile(res, data) {
-    fs.writeFile('output.json', data, (err) => {
+    fs.appendFile('output.json', data, (err) => {
         console.log('File successfully written! - Check your project directory for the output.json file');
     });
-
-    // Finally, we'll just send out a message to the browser reminding you that this app does not have a UI.
-    res.send('Check your console!');
 }
 
 app.get('/scrape', (req, res) => {
@@ -63,17 +60,16 @@ app.get('/scrape', (req, res) => {
         let headline = $('h1 .js-headline-text').first();
         let headlineText = headline.text();
         json.guardianHeadline = headlineText;
-        json.conflation = conflateHeadlines(json.sunHeadline, json.starHeadline, json.guardianHeadline);
+        json.conflation = conflateHeadlines(json);
         const pjson = JSON.stringify(json, null, 4);
-        //console.log('pjson', pjson);
         const T = new Twit(config);
-        T.post('statuses/update', { status: json.conflation }, (err, data, response) => {
-            if (!err) {
-                console.log(data);
-                console.log(response);
-            }
-        });
-        writeFile(res, pjson);
+        // T.post('statuses/update', { status: json.conflation }, (err, data, response) => {
+        //     if (!err) {
+        //         console.log(data);
+        //         console.log(response);
+        //     }
+        // });
+        writeFile(res, `,${pjson}`);
     }).catch((err) => {
         console.log('there was a request error: ', err);
     });
