@@ -34,4 +34,5 @@ TBC
 7. Determine which headlines end with a conjunction and move them to start of array
 8. Determine which headlines end with a handle verb and move them to start of array
 9. Ensure last headline in array doesn't end with a conjuntion or handle verb
+10. Capitalise first letter
 

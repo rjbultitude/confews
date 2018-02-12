@@ -3,7 +3,7 @@ const fs      = require('fs');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const Twit = require('twit');
-const conflateHeadlines = require('./conflate-headlines');
+const conflateHeadlines = require('./app_modules/conflate-headlines');
 const config = require('./config');
 const app     = express();
 
