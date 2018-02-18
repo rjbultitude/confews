@@ -15,8 +15,28 @@ const app     = express();
 
 function writeFile(res, data) {
     fs.appendFile('output.json', data, (err) => {
-        console.log('File successfully written! - Check your project directory for the output.json file');
+        console.log('File successfully written: output.json');
     });
+}
+
+function postAndSave(json) {
+    const pjson = JSON.stringify(json, null, 4);
+        const T = new Twit(config);
+        // T.post('statuses/update', { status: json.conflation }, (err, data, response) => {
+        //     if (!err) {
+        //         console.log(data);
+        //         console.log(response);
+        //     }
+        // });
+        writeFile(res, `,${pjson}`);
+}
+
+function useStatic(json) {
+    json.sunHeadline = 'DEADLY ATTACK';
+    json.starHeadline = 'Queen breaks finger';
+    json.guardianHeadline = 'Tax cuts for big business';
+    json.conflation = conflateHeadlines(json);
+    console.log('conflated headlines', json.conflation);
 }
 
 app.get('/scrape', (req, res) => {
@@ -61,17 +81,9 @@ app.get('/scrape', (req, res) => {
         let headlineText = headline.text();
         json.guardianHeadline = headlineText;
         json.conflation = conflateHeadlines(json);
-        const pjson = JSON.stringify(json, null, 4);
-        const T = new Twit(config);
-        // T.post('statuses/update', { status: json.conflation }, (err, data, response) => {
-        //     if (!err) {
-        //         console.log(data);
-        //         console.log(response);
-        //     }
-        // });
-        writeFile(res, `,${pjson}`);
     }).catch((err) => {
-        console.log('there was a request error: ', err);
+        console.log('there was a request error: ');
+        useStatic(json);
     });
 });
 
