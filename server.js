@@ -19,7 +19,7 @@ function writeFile(res, data) {
     });
 }
 
-function postAndSave(json) {
+function postAndSave(res, json) {
     const pjson = JSON.stringify(json, null, 4);
         const T = new Twit(config);
         // T.post('statuses/update', { status: json.conflation }, (err, data, response) => {
@@ -81,8 +81,9 @@ app.get('/scrape', (req, res) => {
         let headlineText = headline.text();
         json.guardianHeadline = headlineText;
         json.conflation = conflateHeadlines(json);
+        postAndSave(res, json);
     }).catch((err) => {
-        console.log('there was a request error: ');
+        console.log('there was a request error: ', err);
         useStatic(json);
     });
 });

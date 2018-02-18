@@ -43,7 +43,7 @@ class StringArrayUtilities {
     }
     sanitiseStrArr() {
         this.strArr = this.strArr.map((str) => {
-            return str.replace(/\'|\"|\(|\)|breaking/g, '');
+            return str.replace(/\'|\"|\(|\)|\:|breaking|BREAKING/g, '');
         });
         return this;
     }
@@ -51,7 +51,6 @@ class StringArrayUtilities {
         this.strArr = this.strArr.map((str) => {
             const wordsCommaStop = this.strUtil.wordsUntilCommaStop(str);
             if (wordsCommaStop) {
-                console.log('wordsCommaStop', wordsCommaStop);
                 return wordsCommaStop;
             }
             return this.strUtil.firstThreeWords(str);
@@ -60,13 +59,16 @@ class StringArrayUtilities {
     }
     arrangeStrArr() {
         const newArr = [];
-        this.strArr.forEach((str, i) => {
+        this.strArr.forEach((str, i, strArr) => {
             if (this.strUtil.endsWithConjunction(str)) {
-                newArr[0] = str;
+                let theSlice = strArr[i];
+                newArr.unshift(theSlice);
+            } else {
+                newArr.push(str);
             }
-            newArr[i] = str;
         });
-        this.strArr = newArr;
+        this.strArr = newArr.map((str) => str);
+        console.log('this.strArr', this.strArr);
         return this;
     }
 }
