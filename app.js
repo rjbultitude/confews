@@ -3,8 +3,8 @@ const fs      = require('fs');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const Twit = require('twit');
-const conflateHeadlines = require('./app_modules/conflate-headlines');
 const config = require('./config');
+const conflateHeadlines = require('./app_modules/conflate-headlines');
 const app     = express();
 
 // To write to the system we will use the built in 'fs' library.
@@ -20,15 +20,21 @@ function writeFile(res, data) {
 }
 
 function postAndSave(res, json) {
-    const pjson = JSON.stringify(json, null, 4);
-        const T = new Twit(config);
-        // T.post('statuses/update', { status: json.conflation }, (err, data, response) => {
-        //     if (!err) {
-        //         console.log(data);
-        //         console.log(response);
-        //     }
-        // });
-        writeFile(res, `,${pjson}`);
+    const T = new Twit(config);
+    T.post('statuses/update', { status: json.conflation }, (err, data, response) => {
+        if (!err) {
+            console.log('data', data);
+            console.log('data', response);
+        } else {
+            console.log('Twittr error', err);
+        }
+    });
+    console.log(json.conflation);
+    // Output
+    // app.get('/output', (req, res) => res.send(json.conflation));
+    // Write to static file
+    // const pjson = JSON.stringify(json, null, 4);
+    // writeFile(res, `,${pjson}`);
 }
 
 function useStatic(json) {
@@ -39,7 +45,7 @@ function useStatic(json) {
     console.log('conflated headlines', json.conflation);
 }
 
-app.get('/scrape', (req, res) => {
+app.get('/', (req, res) => {
 
     let json = { sunHeadline : '', starHeadline : '', guardianHeadline : '', conflation: ''};
 
@@ -83,13 +89,10 @@ app.get('/scrape', (req, res) => {
         json.conflation = conflateHeadlines(json);
         postAndSave(res, json);
     }).catch((err) => {
-        console.log('there was a request error: ', err);
+        const reqErr = 'there was a request error: ';
+        console.log(reqErr, err);
         useStatic(json);
     });
 });
 
-app.listen('8081');
-
-console.log('Magic happens on port 8081');
-
-exports = module.exports = app;
+module.exports = app;
