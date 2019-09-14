@@ -25,6 +25,7 @@
 
 # Packages
 node_modules/
+**/node_modules/
 
 # Others
 sql/
@@ -48,4 +49,5 @@ Desktop.ini
 # add project specific ignores here
 /dist
 /output.json
-/config.js
+**/config.js
+.firebaserc
