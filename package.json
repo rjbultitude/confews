@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "test",
+    "deploy": "gcloud functions deploy confews --runtime --trigger-event",
     "start": "node app.local.js",
     "stop": "node app.local.js"
   },
