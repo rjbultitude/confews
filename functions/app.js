@@ -15,7 +15,7 @@ const app     = express();
 
 function writeFile(res, data) {
     fs.appendFile('output.json', data, (err) => {
-        console.log('File successfully written: output.json');
+        console.log('File successfully written: output.json', err);
     });
 }
 
@@ -88,6 +88,7 @@ app.get('/', (req, res) => {
         json.guardianHeadline = headlineText;
         json.conflation = conflateHeadlines(json);
         postAndSave(res, json);
+        return res;
     }).catch((err) => {
         const reqErr = 'there was a request error: ';
         console.log(reqErr, err);

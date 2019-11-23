@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "test",
-    "deploy": "gcloud functions deploy confews --runtime --trigger-event",
+    "deploy": "gcloud functions deploy confews --runtime nodejs10 --trigger-event",
+    "lint": "eslint .",
     "start": "node app.local.js",
     "stop": "node app.local.js"
   },
@@ -19,5 +20,9 @@
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "twit": "^2.2.9"
+  },
+  "devDependencies": {
+    "eslint": "^6.7.0",
+    "eslint-plugin-promise": "^4.2.1"
   }
 }
