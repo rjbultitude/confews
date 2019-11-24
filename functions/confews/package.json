@@ -6,11 +6,12 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "deploy": "gcloud functions deploy confews --runtime nodejs10 --trigger-http --entry-point app"
+    "deploy": "gcloud functions deploy confews --runtime nodejs10 --trigger-topic newstrigger --entry-point getHeadlines"
   },
   "author": "richard bultitude",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/pubsub": "^1.1.5",
     "cheerio": "^1.0.0-rc.2",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",

@@ -1,9 +1,11 @@
+const {PubSub} = require('@google-cloud/pubsub');
 const fs = require('fs');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const Twit = require('twit');
 const config = require('./config');
 const conflateHeadlines = require('./conflate-headlines');
+new PubSub();
 
 // For local testing only
 function writeFile(data) {
@@ -90,6 +92,14 @@ function getHeadlines(res, callBack) {
     useStatic(json);
   });
 }
+
+exports.subscribe = (pubsubMessage) => {
+  const msg = Buffer.from(pubsubMessage.data, 'base64').toString();
+  if (msg) {
+    getHeadlines();
+  }
+  // console.log(msg);
+};
 
 module.exports = {
   getHeadlines
