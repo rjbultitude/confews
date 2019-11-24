@@ -19,13 +19,16 @@ function writeFile(data) {
 
 function postToTwitter(json) {
   const T = new Twit(config);
-  T.post('statuses/update', { status: `breaking ${json.conflation}` }, (err, data, response) => {
-    if (!err) {
-      // console.log('Success. Data: ', data);
-      console.log('Success. Response', response);
-    } else {
-      console.log('Twitter error', err.message);
-    }
+  T.post(
+    'statuses/update',
+    { status: `breaking ${json.conflation}` },
+    (err, data, response) => {
+      if (!err) {
+        // console.log('Success. Data: ', data);
+        console.log('Success. Response');
+      } else {
+        console.log('Twitter error', err.message);
+      }
   });
 }
 
