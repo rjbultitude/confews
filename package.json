@@ -5,7 +5,6 @@
   "main": "server.js",
   "scripts": {
     "test": "test",
-    "deploy": "gcloud functions deploy confews --runtime nodejs10 --trigger-event",
     "lint": "eslint .",
     "start": "node app.local.js",
     "stop": "node app.local.js"
