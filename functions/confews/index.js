@@ -1,11 +1,58 @@
+var __DEV__ = process.env.NODE_ENV === 'development';
+console.log('__DEV__', __DEV__);
+
 const {PubSub} = require('@google-cloud/pubsub');
-const fs = require('fs');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const Twit = require('twit');
 const config = require('./config');
 const conflateHeadlines = require('./conflate-headlines');
 new PubSub();
+
+if (__DEV__) {
+  const fs = require('fs');
+}
+
+// Scaping selectors
+const sunSelector = '.teaser__headline';
+const starSelector = '.teaser-hero .headline';
+const guardianSelector = '.js-headline-text';
+const expressSelector = '.main-story h4';
+const mirrorSelector = '.headline';
+
+// Sources
+const sunOptions = {
+  uri: 'https://www.thesun.co.uk/news/',
+  transform: function(body) {
+    return cheerio.load(body);
+  }
+};
+const starOptions = {
+  uri: 'https://www.dailystar.co.uk/news',
+  transform: function(body) {
+    return cheerio.load(body);
+  }
+};
+const guardianOptions = {
+  uri: 'https://www.theguardian.com/uk',
+  transform: function(body) {
+    return cheerio.load(body);
+  }
+};
+
+const expressOptions = {
+  uri: 'https://www.express.co.uk/news',
+  transform: function(body) {
+    return cheerio.load(body);
+  }
+}
+
+const mirrorOptions = {
+  uri: 'https://www.mirror.co.uk/news',
+  transform: function(body) {
+    return cheerio.load(body);
+  }
+}
 
 // For local testing only
 function writeFile(data) {
@@ -21,7 +68,7 @@ function postToTwitter(json) {
   const T = new Twit(config);
   T.post(
     'statuses/update',
-    { status: `breaking ${json.conflation}` },
+    { status: `${json.conflation}` },
     (err, data, response) => {
       if (!err) {
         // console.log('Success. Data: ', data);
@@ -41,50 +88,57 @@ function useStatic(json) {
 }
 
 function getHeadlines(res, callBack) {
-  let json = { sunHeadline : '', starHeadline : '', guardianHeadline : '', conflation: ''};
-
-  const sunOptions = {
-    uri: 'https://www.thesun.co.uk/news/',
-    transform: function (body) {
-      return cheerio.load(body);
-    }
-  };
-
-  const starOptions = {
-    uri: 'https://www.dailystar.co.uk/news',
-    transform: function (body) {
-      return cheerio.load(body);
-    }
-  };
-
-  const guardianOptions = {
-    uri: 'https://www.theguardian.com/uk',
-    transform: function (body) {
-      return cheerio.load(body);
-    }
+  let json = {
+    sunHeadline: '',
+    starHeadline: '',
+    guardianHeadline: '',
+    expressHeadline: '',
+    mirrorHeadline: '',
+    conflation: ''
   };
 
   // Sun request
   rp(sunOptions).then(($) => {
-    let headline = $('.teaser__headline').first();
+    let headline = $(sunSelector).first();
     let headlineText = headline.text();
     json.sunHeadline = headlineText;
     // Star request
     return rp(starOptions);
-  }).then(($) => {
-    let headline = $('.teaser-hero .headline').first();
+  })
+  .then(($) => {
+    let headline = $(starSelector).first();
     let headlineText = headline.text();
     json.starHeadline = headlineText;
+    // Express request
+    return rp(expressOptions);
+  })
+  .then(($) => {
+    let headline = $(expressSelector).first();
+    let headlineText = headline.text();
+    json.expressHeadline = headlineText;
+    // Mirror request
+    return rp(mirrorOptions);
+  })
+  .then(($) => {
+    let headline = $(mirrorSelector).first();
+    let headlineText = headline.text();
+    json.mirrorHeadline = headlineText;
+    // Guardian request
     return rp(guardianOptions);
-  }).then(($) => {
-    let headline = $('.js-headline-text').first();
+  })
+  .then(($) => {
+    let headline = $(guardianSelector).first();
     let headlineText = headline.text();
     json.guardianHeadline = headlineText;
     json.conflation = conflateHeadlines(json);
     console.log('json.conflation', json.conflation);
-    const pjson = JSON.stringify(json, null, 4);
-    writeFile(`,${pjson}`);
-    postToTwitter(json);
+    if (__DEV__) {
+      const pjson = JSON.stringify(json, null, 4);
+      writeFile(pjson);
+    }
+    if (__DEV__ === false) {
+      postToTwitter(json);
+    }
     if (callBack) {
       callBack(json);
     }
