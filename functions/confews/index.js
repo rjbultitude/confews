@@ -5,13 +5,11 @@ const {PubSub} = require('@google-cloud/pubsub');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 const Twit = require('twit');
+const fs = require('fs');
 const config = require('./config');
 const conflateHeadlines = require('./conflate-headlines');
 new PubSub();
 
-if (__DEV__) {
-  const fs = require('fs');
-}
 
 // Scaping selectors
 const sunSelector = '.teaser__headline';
@@ -56,6 +54,7 @@ const mirrorOptions = {
 
 // For local testing only
 function writeFile(data) {
+  console.log('write file data', data);
   fs.appendFile('output.json', data, (err) => {
     if (err) {
       console.warn('Error writing to file', err);
