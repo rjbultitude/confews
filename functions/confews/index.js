@@ -31,12 +31,6 @@ const starOptions = {
     return cheerio.load(body);
   }
 };
-const guardianOptions = {
-  uri: 'https://www.theguardian.com/uk',
-  transform: function(body) {
-    return cheerio.load(body);
-  }
-};
 
 const expressOptions = {
   uri: 'https://www.express.co.uk/news',
@@ -90,7 +84,6 @@ function getHeadlines(res, callBack) {
   let json = {
     sunHeadline: '',
     starHeadline: '',
-    guardianHeadline: '',
     expressHeadline: '',
     mirrorHeadline: '',
     conflation: ''
@@ -122,13 +115,6 @@ function getHeadlines(res, callBack) {
     let headline = $(mirrorSelector).first();
     let headlineText = headline.text();
     json.mirrorHeadline = headlineText;
-    // Guardian request
-    return rp(guardianOptions);
-  })
-  .then(($) => {
-    let headline = $(guardianSelector).first();
-    let headlineText = headline.text();
-    json.guardianHeadline = headlineText;
     json.conflation = conflateHeadlines(json);
     console.log('json.conflation', json.conflation);
     if (__DEV__) {
@@ -142,7 +128,8 @@ function getHeadlines(res, callBack) {
       callBack(json);
     }
     return res;
-  }).catch((err) => {
+  })
+  .catch((err) => {
     const reqErr = 'there was a request error: ';
     console.log(reqErr, err);
     useStatic(json);

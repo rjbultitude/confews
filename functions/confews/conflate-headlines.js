@@ -1,7 +1,5 @@
-const wordHelpers = require('./string-classes');
-const { StringUtilities } = wordHelpers;
-const { StringArrayUtilities } = wordHelpers;
-const strUtil = new StringUtilities();
+const StringArrayUtilities = require('./string-array-utilities');
+const strUtil = require('./string-utilities');
 
 function filterHeadlines(headlines) {
   // let newHeadlines = new Object();
@@ -9,8 +7,6 @@ function filterHeadlines(headlines) {
   const headlinesArr = Object.keys(headlines);
   for (const key of headlinesArr) {
     const val = headlines[key];
-    console.log('val', val);
-    console.log('key', key);
     if (val !== '' && strUtil.hasBlacklistWords(val) === false) {
       // Object.defineProperty(newHeadlines, key, {value: val, enumerable: true});
       newHeadlinesArr.push(val);
@@ -21,11 +17,18 @@ function filterHeadlines(headlines) {
 
 module.exports = function conflateHeadlines(headlines) {
   console.log('headlines', headlines);
+  // Converting from Object to Array
+  // Removing empty or offensive headlines
   const filteredHeadlines = filterHeadlines(headlines);
-  console.log('filteredHeadlines', filteredHeadlines);
-  const sunSanit = strUtil.removeNonWordCharsFrmSrtEnd(filteredHeadlines.sunHeadline);
-  const strArrUtil = new StringArrayUtilities([sunSanit, ...filteredHeadlines]);
-  const allSanit = strArrUtil.sanitiseStrArr().truncateStrArr().arrangeStrArr().strArr.join(' ');
-  const capFirst = strUtil.capitaliseFirstLetter(allSanit);
+  const strArrUtil = new StringArrayUtilities([...filteredHeadlines]);
+  const nHeadline = strArrUtil
+    .rmNonWordCharsHeadlines()
+    .sanitiseStrArr()
+    .truncateStrArr()
+    .arrangeStrArr()
+    .joinStr()
+    .finalStr;
+  const nHeadlineNoConjEnd = strUtil.rmConjunctionFromEnd(nHeadline);
+  const capFirst = strUtil.capitaliseFirstLetter(nHeadlineNoConjEnd);
   return capFirst;
 }
